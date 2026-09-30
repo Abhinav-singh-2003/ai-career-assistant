@@ -1,12 +1,10 @@
+import "dotenv/config";
 import express from "express";//1,6,9,14,19
 import cors from "cors";
-import dotenv from "dotenv";
 import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import resumeRoutes from "./routes/resumeRoutes";
-
-dotenv.config();//secrets are loaded from .env file into process.env to use them in the application.
 
 const app= express();//express instance is created to handle incoming requests and send responses.
 
