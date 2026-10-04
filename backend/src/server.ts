@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import resumeRoutes from "./routes/resumeRoutes";
 import jobMatchRoutes from "./routes/jobMatchRoutes";
+import interviewRoutes from "./routes/interviewRoutes";
 
 const app= express();//express instance is created to handle incoming requests and send responses.
 
@@ -18,6 +19,7 @@ app.use("/api/auth",authRoutes);//authRoutes are mounted on the /api/auth path, 
 app.use("/api/users", userRoutes);//userRoutes are mounted on the /api/users path, allowing the server to handle user-related routes defined in userRoutes.)
 app.use("/api/resumes", resumeRoutes);//creating and fetching resume only for logged in user .
 app.use("/api/job-matches", jobMatchRoutes);//jobMatchRoutes are mounted on the /api/job-matches path, allowing the server to handle job matching-related routes defined in jobMatchRoutes.
+app.use("/api/interviews", interviewRoutes);//interviewRoutes are mounted on the /api/interviews path, allowing the server to handle interview-related routes defined in interviewRoutes.   
 app.get("/", (req,res)=>{
     res.json({
         message: "ai-career-assistant api is running"
