@@ -1,4 +1,4 @@
-import mongoose ,{Document ,Schema } from "mongoose"; //32
+import mongoose ,{Document ,Schema } from "mongoose"; //32, 37
 
 
 //interface for the interview question...
@@ -7,6 +7,18 @@ export interface IInterviewQuestion {
     category:string,
     difficulty:"easy" | "medium" | "hard"
 }
+
+//interface for the interview answer...
+export interface IInterviewAnswer {
+    questionIndex: number,
+    answer:string,
+    score?:number,
+    strengths?:string[],
+    improvements?:string[],
+    idealAnswer?:string
+}
+
+
 //schema for the interciew question...
 const interviewQuestionSchema= new Schema <IInterviewQuestion>(
     {
@@ -29,11 +41,45 @@ const interviewQuestionSchema= new Schema <IInterviewQuestion>(
         }
 );
 
+//schema for the interview answer...
+const interviewAnswerSchema= new Schema <IInterviewAnswer>(
+    {
+        questionIndex:{
+            type:Number,
+            required:true
+        },
+        answer:{
+            type:String,
+            required:true
+        },
+        score:{
+            type:Number,
+            min:0,
+            max:10
+        },
+        strengths:{
+            type:[String],
+            default:[]
+        },
+        improvements:{
+            type:[String],
+            default:[]
+        },
+        idealAnswer:{
+            type:String
+        }
+    },
+    {
+        _id:false
+    }
+);
+
 //interface for the interview , used extend beacause we want to use the document properties of mongoose...
 export interface IInterview extends Document {
     userId:mongoose.Types.ObjectId;
     role:string;
     questions:IInterviewQuestion[];
+    answers:IInterviewAnswer[];
 }
 
 const interviewSchema =new Schema<IInterview>(
@@ -51,6 +97,11 @@ const interviewSchema =new Schema<IInterview>(
         questions:{
             type:[interviewQuestionSchema],
             default:[]
+        },
+        answers:{
+            type:[interviewAnswerSchema],
+            default:[]
+
         }
     },
     {
@@ -58,4 +109,4 @@ const interviewSchema =new Schema<IInterview>(
     }
 );
 
-export default mongoose.model<IInterview>("Interview",interviewSchema);
+export default mongoose.model<IInterview>("Interview", interviewSchema);

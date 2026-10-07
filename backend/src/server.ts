@@ -1,5 +1,5 @@
 import "dotenv/config";
-import express from "express";//1,6,9,14,19,31
+import express from "express";//1,6,9,14,19,31,36
 import cors from "cors";
 import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";

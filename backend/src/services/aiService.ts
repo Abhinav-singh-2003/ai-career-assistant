@@ -1,4 +1,4 @@
-    import OpenAI from "openai";//23,28,33
+    import OpenAI from "openai";//23,28,33,38
     
     //used for open but it is paid so used openrouter..
     // const openai= new OpenAI({
@@ -202,3 +202,74 @@
                 );
         }
     };
+
+
+//function to evaluate interview answer for a given question using AI
+export interface InterviewEvaluation {
+  score: number;
+  strengths: string[];
+  improvements: string[];
+  idealAnswer: string;
+}
+
+export const evaluateInterviewAnswer = async(question: string, answer: string , role: string): Promise<InterviewEvaluation> => {
+    const prompt = `
+        You are an expert technical interviewer.
+        Evaluate a candidate's answer to an interview question.
+
+        ROLE:
+        ${role}
+
+        QUESTION:
+        ${question}
+
+        CANDIDATE ANSWER:
+        ${answer}
+
+        Return ONLY valid JSON using exactly this structure:
+
+        {
+        "score": 0,
+        "strengths": [],
+        "improvements": [],
+        "idealAnswer": ""
+        }
+
+        Rules:
+
+        - score must be a number from 0 to 10.
+        - Evaluate technical correctness, completeness, clarity, and practical understanding.
+        - strengths should identify what the candidate did well.
+        - improvements should identify specific things the candidate should improve.
+        - idealAnswer should be a concise example of a strong answer.
+        - Do not give a perfect score unless the answer is genuinely excellent.
+        `;
+
+        const respones=await openai.responses.create({
+            model:"openrouter/free",
+
+            input:[
+                {
+                    role:"system",
+                    content:"You are an expert technical interviewer."
+                },
+                {
+                    role:"user",
+                    content:prompt
+                }
+            ]
+        });
+
+        const content=respones.output_text;
+        if(!content){
+            throw new Error("AI returned an empty response");
+        }
+        try{
+            const parsed = JSON.parse(content);
+            return parsed as InterviewEvaluation;
+        } catch {
+            throw new Error(
+                "AI returned invalid Interview Evaluation JSON"
+            );
+        }
+};
