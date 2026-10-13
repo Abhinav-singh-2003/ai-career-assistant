@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from "./components/ProtectedRoutes";
 import Resumes from "./pages/Resumes";
+import JobMatcher from "./pages/JobMatcher";
 
 import './App.css';
 
@@ -22,6 +23,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/resumes" element={<Resumes />} />
+            <Route path="/job-matcher" element={<JobMatcher />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />}/>
