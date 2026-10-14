@@ -4,6 +4,7 @@ export interface IResume extends Document{
     title: string;
     fileUrl?:string;
     extractedText?: string;
+    createdAt?: Date;
 }
 
 const resumeSchema = new Schema<IResume>(
@@ -36,5 +37,4 @@ const resumeSchema = new Schema<IResume>(
 );
 
 export default mongoose.model<IResume>("resume", resumeSchema);
-
 

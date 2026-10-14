@@ -2,7 +2,7 @@ import api from "./api";
 import type { Resume, ResumeAnalysis } from "../types/resume";
 
 export async function fetchMyResumes() {
-   const response = await api.get<{ count: Number; resumes: Resume[]; }>("/resumes/my");
+   const response = await api.get<{ count: number; resumes: Resume[]; }>("/resumes/my");
    return response.data;
 }
 

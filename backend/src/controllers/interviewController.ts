@@ -14,18 +14,18 @@ export const generateInterview = async (req: Request, res: Response): Promise<vo
         }
 
         const { role } = req.body;
-        if (!role) {
+        if (typeof role !== "string" || role.trim().length < 2 || role.trim().length > 100) {
             res.status(400).json({
-                message: "Role is required"
+                message: "Provide a job role between 2 and 100 characters"
             });
             return;
         }
 
-        const questions = await generateInterviewQuestions(role);
+        const questions = await generateInterviewQuestions(role.trim());
 
         const interview = await Interview.create({
             userId: req.user.userId,
-            role,
+            role: role.trim(),
             questions
         });
 
@@ -36,7 +36,7 @@ export const generateInterview = async (req: Request, res: Response): Promise<vo
     } catch (error) {
         console.error("Error generating interview questions:", error);
         res.status(500).json({
-            message: " generation Internal server error"
+            message: error instanceof Error ? error.message : "Failed to generate interview questions"
         });
     }
 };
@@ -62,9 +62,14 @@ export const submitInterviewAnswers = async (req: Request, res: Response): Promi
         const { questionIndex, answer } = req.body;
         const questionIndexNum = Number(questionIndex);
 
-        if (!Number.isInteger(questionIndexNum) || answer === undefined) {
+        if (
+            !Number.isInteger(questionIndexNum)
+            || typeof answer !== "string"
+            || answer.trim().length < 10
+            || answer.length > 5000
+        ) {
             res.status(400).json({
-                message: "questionIndex and answer are required"
+                message: "Provide a valid question index and an answer between 10 and 5000 characters"
             });
             return;
         }
@@ -98,20 +103,27 @@ export const submitInterviewAnswers = async (req: Request, res: Response): Promi
 
         const evaluation = await evaluateInterviewAnswer(
             question.question,
-            answer,
+            answer.trim(),
             interview.role
         );
 
-         
-            interview.answers.push({
-                questionIndex: questionIndexNum,
-                answer,
-                score: evaluation.score,
-                strengths: evaluation.strengths,
-                improvements: evaluation.improvements,
-                idealAnswer: evaluation.idealAnswer
-            });
-        
+        const savedAnswer = {
+            questionIndex: questionIndexNum,
+            answer: answer.trim(),
+            score: evaluation.score,
+            strengths: evaluation.strengths,
+            improvements: evaluation.improvements,
+            idealAnswer: evaluation.idealAnswer
+        };
+        const existingAnswerIndex = interview.answers.findIndex(
+            (item) => item.questionIndex === questionIndexNum
+        );
+
+        if (existingAnswerIndex >= 0) {
+            interview.answers[existingAnswerIndex] = savedAnswer;
+        } else {
+            interview.answers.push(savedAnswer);
+        }
 
         await interview.save();
 
@@ -122,7 +134,7 @@ export const submitInterviewAnswers = async (req: Request, res: Response): Promi
     } catch (error) {
         console.error("Error submitting interview answer:", error);
         res.status(500).json({
-            message: "Internal server error"
+            message: error instanceof Error ? error.message : "Failed to evaluate interview answer"
         });
     }
 };
@@ -184,4 +196,3 @@ export const getInterviewById = async (req: Request, res: Response): Promise<voi
         });
     }
 }
-

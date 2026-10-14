@@ -14,7 +14,7 @@ export async function submitInterviewAnswer(interviewId: string, questionIndex: 
     const response = await api.post<{
         message: string;
         evaluation: InterviewEvaluation;
-    }>(`/interviews/${interviewId}/answer`, { questionIndex, answer,});
+    }>(`/interviews/${interviewId}/answers`, { questionIndex, answer,});
 
     return response.data.evaluation;
 }

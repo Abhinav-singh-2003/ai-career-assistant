@@ -100,7 +100,9 @@ Create a `.env` file inside the `backend/` directory:
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_secret
-OPENAI_API_KEY=your_openai_api_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+# Optional: choose an OpenRouter model; defaults to openrouter/free
+OPENROUTER_MODEL=openrouter/free
 ```
 
 Replace the example values with your own configuration. Keep this file private and never commit API keys or secrets to GitHub.

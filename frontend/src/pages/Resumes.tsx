@@ -36,7 +36,28 @@ export default function Resumes() {
         }
     }
     useEffect(() => {
-        void loadResumes();
+        let isActive = true;
+
+        fetchMyResumes()
+            .then((data) => {
+                if (isActive) {
+                    setResumes(data.resumes);
+                }
+            })
+            .catch((err: unknown) => {
+                if (isActive) {
+                    setError(getErrorMessage(err));
+                }
+            })
+            .finally(() => {
+                if (isActive) {
+                    setLoading(false);
+                }
+            });
+
+        return () => {
+            isActive = false;
+        };
     }, []);
 
     function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -314,7 +335,6 @@ function AnalysisList({ title, items }: AnalysisListProps) {
         </div>
     );
 }
-
 
 
 

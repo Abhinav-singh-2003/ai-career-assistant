@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode, createElement } from "react";
+import { createContext, useContext, useState, type ReactNode, createElement } from "react";
 import api from "../services/api";
 import { type User, type AuthResponse } from "../types/auth";
 
@@ -26,16 +26,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   });
 
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
-
-  useEffect(() => {
-    if (token) {
-      api.defaults.headers.common["Authorization"] = "Bearer " + token;
-    } else {
-      delete api.defaults.headers.common["Authorization"];
-    }
-  }, [token]);
-
-
 
   const login = async (email: string, password: string) => {
     const response = await api.post<AuthResponse>("/auth/login", { email, password });

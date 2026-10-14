@@ -1,16 +1,19 @@
-import mongoose from "mongoose";//2
+import mongoose from "mongoose";
 
-const connectDB= async() : Promise<void> =>{
-    try {
-        await mongoose.connect(process.env.MONGO_URI as string);
+const connectDB = async (): Promise<void> => {
+  const mongoUri = process.env.MONGO_URI;
 
-        console.log("MongoDB connected successfully");
-    }catch (error){
-        console.log(" MongoDB connection failed", error);
-        process.exit(1);
-    }
+  if (!mongoUri) {
+    throw new Error("MONGO_URI is missing. Add your MongoDB Atlas connection string to backend/.env");
+  }
+
+  try {
+    await mongoose.connect(mongoUri);
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error);
+    throw error;
+  }
 };
 
-
 export default connectDB;
-
