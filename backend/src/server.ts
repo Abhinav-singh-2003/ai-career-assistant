@@ -10,7 +10,15 @@ import interviewRoutes from "./routes/interviewRoutes";
 
 const app = express();
 
-app.use(cors());
+
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "ai-career-assistant-350ngk7xj-abhinavs-projects-4ccab027.vercel.app"
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
