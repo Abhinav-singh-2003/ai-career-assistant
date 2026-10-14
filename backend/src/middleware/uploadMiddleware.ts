@@ -1,20 +1,18 @@
-import { now } from "mongoose";
-import multer, { Multer } from "multer";//20
+import { randomUUID } from "node:crypto";
+import { tmpdir } from "node:os";
+import multer from "multer";
 import path from "path";
 
-const storage = multer.diskStorage({//where and what name with time.
-
-    destination:(req, file, cb)=>{ //where..
-        cb(null, "uploads/");
+const storage = multer.diskStorage({
+    destination: (_req, _file, cb) => {
+        cb(null, tmpdir());
     },
-
-    filename:(req, file, cb)=>{ //what saved file be called
-        const uniqueName = `${Date.now()}-${file.originalname}`;
-        cb(null,uniqueName);
+    filename: (_req, file, cb) => {
+        cb(null, `${randomUUID()}${path.extname(file.originalname).toLowerCase()}`);
     }
 });
 
-const fileFilter = ( //to check the .extension===.pdf to accept the file.
+const fileFilter = (
     req:Express.Request,
     file:Express.Multer.File,
     cb:multer.FileFilterCallback
@@ -24,14 +22,14 @@ const fileFilter = ( //to check the .extension===.pdf to accept the file.
     if(extension===".pdf"){
         cb(null, true);
     }else{
-        cb(new Error("only pdf file are allowed"));
+        cb(new Error("Only PDF files are allowed"));
     }
 };
 
-const upload =multer({//combile all ine one .and apply limit also.
+const upload =multer({
     storage,
     fileFilter,
-    limits: {fileSize: 5 *1024 *1024}
+    limits: {fileSize: 4 * 1024 * 1024}
 });
 
 export default upload;

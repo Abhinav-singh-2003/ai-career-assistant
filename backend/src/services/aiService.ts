@@ -8,8 +8,8 @@
     const openai = new OpenAI({
         apiKey: process.env.OPENROUTER_API_KEY,
         baseURL: "https://openrouter.ai/api/v1",
-        timeout: 90_000,
-        maxRetries: 2
+        timeout: 25_000,
+        maxRetries: 0
     });
     const model = process.env.OPENROUTER_MODEL?.trim() || "openrouter/free";
 

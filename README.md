@@ -34,7 +34,7 @@ An AI-powered career preparation platform that helps job seekers improve their r
 **Database and AI**
 - MongoDB
 - Mongoose
-- OpenAI API
+- OpenRouter API
 
 ## Project Structure
 
@@ -49,24 +49,21 @@ ai-career-assistant/
 │   │   ├── routes/
 │   │   ├── services/
 │   │   ├── types/
-│   │   ├── validators/
 │   │   └── server.ts
-│   ├── uploads/
-│   ├── .env
+│   ├── netlify/functions/api.js
 │   └── package.json
 ├── frontend/
+│   ├── public/
 │   ├── src/
 │   │   ├── components/
 │   │   ├── context/
 │   │   ├── pages/
 │   │   ├── services/
 │   │   └── types/
-│   ├── .env
 │   └── package.json
+├── netlify.toml
 └── README.md
 ```
-
-*Note: The structure above describes the intended organization. Update it if your actual folders differ.*
 
 ## Prerequisites
 
@@ -74,7 +71,7 @@ Install the following before running the application:
 
 - Node.js and npm
 - MongoDB, either locally or through MongoDB Atlas
-- An OpenAI API key
+- An OpenRouter API key
 
 ## Installation and Setup
 
@@ -119,13 +116,7 @@ The API should be available at:
 http://localhost:5000
 ```
 
-The root endpoint can be used to check whether the API is running.
-
-### Deploy the backend to Render
-
-The repository includes a `render.yaml` Blueprint for the backend. In Render, create a new Blueprint and select this repository. The service uses `backend/` as its root directory, installs the exact locked dependencies, builds with TypeScript, and starts the compiled server.
-
-Provide a MongoDB connection string for `MONGO_URI` and an OpenRouter API key for `OPENROUTER_API_KEY` when prompted. Render generates `JWT_SECRET` automatically. For an existing Render web service, set the root directory to `backend`, the build command to `npm ci && npm run build`, and the start command to `npm start`; add the same environment variables in the service settings.
+Check `http://localhost:5000/api/health` to confirm the API is running.
 
 ### 3. Configure the frontend
 
@@ -136,19 +127,55 @@ cd frontend
 npm install
 ```
 
-Create a `.env` file inside `frontend/`:
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-Start the frontend:
+Start the frontend. Vite proxies `/api` requests to the local backend:
 
 ```bash
 npm run dev
 ```
 
 Open the local URL printed by Vite in your terminal, typically `http://localhost:5173`.
+
+## Deploy the full app to Netlify
+
+The repository is configured to deploy both the Vite frontend and the Express API as a Netlify Function. The backend stores data in MongoDB Atlas and uses OpenRouter for AI requests; those remain external services.
+
+### 1. Prepare MongoDB Atlas and OpenRouter
+
+- Create a MongoDB Atlas database and database user. Copy its connection string for `MONGO_URI`, replacing the username, password, and database name as needed.
+- Configure Atlas network access to allow connections from Netlify Functions. Netlify does not provide a fixed outbound IP by default; restrict access further with a Netlify static egress IP option if your plan supports it.
+- Create an OpenRouter API key. The key is used only by the backend function.
+
+### 2. Import the repository into Netlify
+
+1. Push the project to GitHub.
+2. In Netlify, choose **Add new project** (or **Add new site**) → **Import an existing project**, then select the repository.
+3. Let Netlify use the repository's `netlify.toml`. The base directory must remain the repository root; do not set it to `frontend`.
+4. The configuration installs and builds both packages, publishes `frontend/dist`, and deploys the API function from `backend/netlify/functions`.
+
+The configured build command is:
+
+```bash
+npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix backend && npm run build --prefix frontend
+```
+
+### 3. Set Netlify environment variables
+
+In the Netlify project, open **Project configuration → Environment variables** and add:
+
+| Variable | Value |
+|---|---|
+| `MONGO_URI` | Your MongoDB Atlas connection string |
+| `JWT_SECRET` | A long, random secret used to sign login tokens |
+| `OPENROUTER_API_KEY` | Your OpenRouter API key |
+| `OPENROUTER_MODEL` | Optional; defaults to `openrouter/free` |
+
+`VITE_API_URL` is set to `/api` in `netlify.toml`; this keeps browser requests on the Netlify site and forwards them to the function. Do not put secrets in any `VITE_` variable because frontend variables are embedded in the public browser bundle. Redeploy after changing environment variables so the frontend is rebuilt.
+
+### 4. Deploy and verify
+
+Deploy the site, then open the Netlify URL. Check `https://YOUR-SITE.netlify.app/api/health`; it should return a JSON health message when `MONGO_URI` is configured. Register or log in to verify the database and API. Then try a resume upload and an AI feature.
+
+Netlify Functions have a 6 MB buffered request limit; binary uploads are base64-encoded, so the effective file limit is about 4.5 MB. Resume PDFs are limited to 4 MB by the backend. Uploaded files are processed from temporary storage and removed after extraction; the extracted resume text is stored in MongoDB, not the original PDF.
 
 ## API Overview
 

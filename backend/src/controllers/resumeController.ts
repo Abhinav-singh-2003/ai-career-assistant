@@ -32,8 +32,6 @@ export const createResume = async(req:Request, res:Response): Promise<void> =>{
         const extractedText = await extractTextFromPDF(uploadedFile.path);
 
         if(!extractedText.trim()){
-            await fs.unlink(uploadedFile.path);
-            uploadedFilePath = undefined;
             res.status(400).json({
                 message:"could not extract text from pdf"
             });
@@ -41,16 +39,14 @@ export const createResume = async(req:Request, res:Response): Promise<void> =>{
         }
 
         //save resume information...
-        const resume= await Resume.create({
+        const resume = await Resume.create({
             userId:req.user.userId,
             title: typeof req.body.title === "string" && req.body.title.trim()
                 ? req.body.title.trim().slice(0, 100)
                 : uploadedFile.originalname,
-            fileUrl:uploadedFile.path,
             extractedText,
         });
 
-        uploadedFilePath = undefined;
         res.status(201).json({
             message:"Resume Uploaded Successfully",
             resume:{
@@ -61,6 +57,10 @@ export const createResume = async(req:Request, res:Response): Promise<void> =>{
         });
     }catch(error){
         console.error("resume upload error:",error);
+        res.status(500).json({
+            message:"failed to process Resume"
+        });
+    } finally {
         if (uploadedFilePath) {
             try {
                 await fs.unlink(uploadedFilePath);
@@ -68,9 +68,6 @@ export const createResume = async(req:Request, res:Response): Promise<void> =>{
                 console.error("Failed to remove incomplete resume upload:", cleanupError);
             }
         }
-        res.status(500).json({
-            message:"failed to process Resume"
-        });
     }
 };
 
