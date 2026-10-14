@@ -14,7 +14,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "ai-career-assistant-350ngk7xj-abhinavs-projects-4ccab027.vercel.app"
+    "https://ai-career-assistant-pearl.vercel.app"
   ],
   credentials: true
 }));
