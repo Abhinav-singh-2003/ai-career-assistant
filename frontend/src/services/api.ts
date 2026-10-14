@@ -1,6 +1,6 @@
 import axios from "axios";
 const api = axios.create({
-    baseURL:"https://ai-career-assistant12.netlify.app/api"
+    baseURL:"http://localhost:5000/api"
 
 });
 
