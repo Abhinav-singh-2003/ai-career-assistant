@@ -121,6 +121,12 @@ http://localhost:5000
 
 The root endpoint can be used to check whether the API is running.
 
+### Deploy the backend to Render
+
+The repository includes a `render.yaml` Blueprint for the backend. In Render, create a new Blueprint and select this repository. The service uses `backend/` as its root directory, installs the exact locked dependencies, builds with TypeScript, and starts the compiled server.
+
+Provide a MongoDB connection string for `MONGO_URI` and an OpenRouter API key for `OPENROUTER_API_KEY` when prompted. Render generates `JWT_SECRET` automatically. For an existing Render web service, set the root directory to `backend`, the build command to `npm ci && npm run build`, and the start command to `npm start`; add the same environment variables in the service settings.
+
 ### 3. Configure the frontend
 
 Open another terminal:

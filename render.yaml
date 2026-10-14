@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ai-career-assistant-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
