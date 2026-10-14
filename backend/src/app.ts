@@ -10,6 +10,7 @@ const app = express();
 
 const allowedOrigins = new Set(
   [
+    "https://ai-career-assistant12.netlify.app",
     "http://localhost:5173",
     process.env.URL,
     process.env.DEPLOY_PRIME_URL,
