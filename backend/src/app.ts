@@ -17,16 +17,25 @@ const allowedOrigins = new Set(
   ].filter((origin): origin is string => Boolean(origin))
 );
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.has(origin)) {
-      callback(null, true);
-      return;
-    }
+app.use(cors((req, callback) => {
+  const origin = req.header("Origin");
+  const host = req.header("X-Forwarded-Host") || req.header("Host");
+  let isSameOrigin = false;
 
-    callback(new Error("Origin is not allowed by CORS"));
-  },
-  credentials: true,
+  if (origin && host) {
+    try {
+      isSameOrigin = new URL(origin).host === host;
+    } catch {
+      isSameOrigin = false;
+    }
+  }
+
+  // The frontend and API are served from the same Netlify site, so any
+  // same-origin request (production, deploy previews, custom domains) is allowed.
+  callback(null, {
+    origin: !origin || isSameOrigin || allowedOrigins.has(origin),
+    credentials: true,
+  });
 }));
 
 app.use(express.json());
